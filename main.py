@@ -17,8 +17,14 @@ def store_raw_images():
     for i in neg_image_urls.split('\n'):
         try:
             print(i)
-            http.request('GET',i)
-            open("neg/" + str(pic_num) + ".jpg",'wb')
+            r = http.request('GET',i,preload_content=False)
+            with open("neg/" + str(pic_num) + ".jpg",'wb') as out:
+                while True:
+                    data = r.read()
+                    if not data:
+                        break
+                    out.write(data)
+            r.release_conn()
             img = cv2.imread("neg/" + str(pic_num) + ".jpg", cv2.IMREAD_GRAYSCALE)
             # should be larger than samples / pos pic (so we can place our image on it)
             resized_image = cv2.resize(img, (100, 100))
